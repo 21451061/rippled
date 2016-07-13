@@ -1278,7 +1278,8 @@ PeerImp::onMessage (std::shared_ptr <protocol::TMProposeSet> const& m)
 
     auto proposal = std::make_shared<LedgerProposal> (
         prevLedger, set.proposeseq (), proposeHash, closeTime,
-        publicKey, calcNodeID(publicKey), suppression);
+        app_.timeKeeper().closeTime(), publicKey, calcNodeID(publicKey),
+        suppression);
     proposal->setSignature (std::move(signature));
 
     std::weak_ptr<PeerImp> weak = shared_from_this();

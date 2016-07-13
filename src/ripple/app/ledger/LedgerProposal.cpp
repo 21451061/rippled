@@ -33,6 +33,7 @@ LedgerProposal::LedgerProposal (
         std::uint32_t seq,
         uint256 const& tx,
         NetClock::time_point closeTime,
+        NetClock::time_point now,
         PublicKey const& publicKey,
         NodeID const& nodeID,
         uint256 const& suppression)
@@ -43,7 +44,7 @@ LedgerProposal::LedgerProposal (
     , mProposeSeq (seq)
     , publicKey_ (publicKey)
     , mPeerID (nodeID)
-    , mTime (std::chrono::steady_clock::now ())
+    , mTime (now)
 {
 }
 
@@ -52,12 +53,13 @@ LedgerProposal::LedgerProposal (
 LedgerProposal::LedgerProposal (
         uint256 const& prevLgr,
         uint256 const& position,
-        NetClock::time_point closeTime)
+        NetClock::time_point closeTime,
+        NetClock::time_point now)
     : mPreviousLedger (prevLgr)
     , mCurrentHash (position)
     , mCloseTime (closeTime)
     , mProposeSeq (seqJoin)
-    , mTime (std::chrono::steady_clock::now ())
+    , mTime (now)
 {
 }
 
@@ -82,21 +84,22 @@ bool LedgerProposal::checkSign () const
 
 bool LedgerProposal::changePosition (
     uint256 const& newPosition,
-    NetClock::time_point closeTime)
+    NetClock::time_point closeTime,
+    NetClock::time_point now)
 {
     if (mProposeSeq == seqLeave)
         return false;
 
     mCurrentHash    = newPosition;
     mCloseTime      = closeTime;
-    mTime           = std::chrono::steady_clock::now ();
+    mTime           = now;
     ++mProposeSeq;
     return true;
 }
 
-void LedgerProposal::bowOut ()
+void LedgerProposal::bowOut (NetClock::time_point now)
 {
-    mTime           = std::chrono::steady_clock::now ();
+    mTime           = now;
     mProposeSeq     = seqLeave;
 }
 
