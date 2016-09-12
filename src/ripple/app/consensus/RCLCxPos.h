@@ -20,6 +20,7 @@
 #ifndef RIPPLE_APP_CONSENSUS_RCLCXPOSITION_H_INCLUDED
 #define RIPPLE_APP_CONSENSUS_RCLCXPOSITION_H_INCLUDED
 
+#include <ripple/app/ledger/LedgerProposal.h>
 #include <ripple/json/json_value.h>
 #include <ripple/basics/chrono.h>
 #include <ripple/protocol/UintTypes.h>

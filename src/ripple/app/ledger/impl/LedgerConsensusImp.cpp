@@ -45,6 +45,7 @@
 #include <ripple/json/to_string.h>
 #include <ripple/overlay/Overlay.h>
 #include <ripple/overlay/predicates.h>
+#include <ripple/protocol/digest.h>
 #include <ripple/protocol/st.h>
 #include <ripple/protocol/Feature.h>
 #include <ripple/beast/core/LexicalCast.h>
@@ -1235,9 +1236,6 @@ void LedgerConsensusImp<Traits>::statusChange (
     JLOG (j_.trace()) << "send status change to peer";
 }
 
-// For the consensus refactor, takeInitialPosition has been split
-// into two pieces. This piece, makeInitialPosition does the
-// non-consensus parts
 template <class Traits>
 auto
 LedgerConsensusImp<Traits>::makeInitialPosition () ->
