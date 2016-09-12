@@ -58,6 +58,7 @@ public:
         NetClock::time_point now,
         PublicKey const& publicKey,
         NodeID const& nodeID,
+        Slice const& signature,
         uint256 const& suppress);
 
     // Our own proposal:
@@ -102,17 +103,10 @@ public:
     {
         return mTime;
     }
-
-    void setSignature (Buffer&& sig)
-    {
-        signature_ = std::move(sig);
-    }
-
-    Slice getSignature () const
+    Blob const& getSignature () const
     {
         return signature_;
     }
-
     bool isInitial () const
     {
         return mProposeSeq == seqJoin;
@@ -153,7 +147,7 @@ private:
 
     PublicKey publicKey_;
     NodeID mPeerID;
-    Buffer signature_;
+    Blob signature_;
 
     NetClock::time_point mTime;
 };

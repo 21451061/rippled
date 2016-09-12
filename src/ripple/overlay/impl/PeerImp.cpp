@@ -1233,7 +1233,7 @@ PeerImp::onMessage (std::shared_ptr <protocol::TMProposeSet> const& m)
 
     PublicKey const publicKey (makeSlice(set.nodepubkey()));
     NetClock::time_point const closeTime { NetClock::duration{set.closetime()} };
-    Buffer signature (set.signature().data(), set.signature ().size());
+    Slice signature (set.signature().data(), set.signature ().size());
 
     uint256 proposeHash, prevLedger;
     memcpy (proposeHash.begin (), set.currenttxhash ().data (), 32);
@@ -1279,8 +1279,7 @@ PeerImp::onMessage (std::shared_ptr <protocol::TMProposeSet> const& m)
     auto proposal = std::make_shared<LedgerProposal> (
         prevLedger, set.proposeseq (), proposeHash, closeTime,
         app_.timeKeeper().closeTime(), publicKey, calcNodeID(publicKey),
-        suppression);
-    proposal->setSignature (std::move(signature));
+        signature, suppression);
 
     std::weak_ptr<PeerImp> weak = shared_from_this();
     app_.getJobQueue ().addJob (

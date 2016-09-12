@@ -36,6 +36,7 @@ LedgerProposal::LedgerProposal (
         NetClock::time_point now,
         PublicKey const& publicKey,
         NodeID const& nodeID,
+        Slice const& signature,
         uint256 const& suppression)
     : mPreviousLedger (pLgr)
     , mCurrentHash (tx)
@@ -46,6 +47,9 @@ LedgerProposal::LedgerProposal (
     , mPeerID (nodeID)
     , mTime (now)
 {
+    signature_.resize (signature.size());
+    std::memcpy(signature_.data(),
+        signature.data(), signature.size());
 }
 
 // Used to construct local proposals
@@ -78,7 +82,7 @@ bool LedgerProposal::checkSign () const
     return verifyDigest (
         publicKey_,
         getSigningHash(),
-        signature_,
+        makeSlice (signature_),
         false);
 }
 

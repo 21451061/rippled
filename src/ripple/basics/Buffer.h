@@ -40,29 +40,8 @@ private:
 
 public:
     Buffer() = default;
-
-    Buffer& operator= (Buffer const& other)
-    {
-        size_ = other.size_;
-        if (size_)
-        {
-            p_.reset (new std::uint8_t[size_]);
-            memcpy (p_.get(), other.p_.get(), size_);
-        }
-        else
-            p_.reset();
-        return *this;
-    }
-
-    Buffer (Buffer const& other)
-        : size_ (other.size_)
-    {
-        if (size_)
-        {
-            p_.reset (new std::uint8_t[size_]);
-            memcpy (p_.get(), other.p_.get(), size_);
-        }
-    }
+    Buffer (Buffer const&) = delete;
+    Buffer& operator= (Buffer const&) = delete;
 
     /** Move-construct.
         The other buffer is reset.
