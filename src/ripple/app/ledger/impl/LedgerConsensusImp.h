@@ -37,10 +37,6 @@ namespace ripple {
   Provides the implementation for LedgerConsensus.
 
   Achieves consensus on the next ledger.
-  This object is created when the consensus process starts, and
-  is destroyed when the process is complete.
-
-  Nearly everything herein is invoked with the master lock.
 
   Two things need consensus:
     1.  The set of transactions.
@@ -72,15 +68,15 @@ private:
 
 public:
 
-    using typename Traits::CxTime_t;
-    using typename Traits::CxPos_t;
-    using typename Traits::CxTxSet_t;
-    using typename Traits::CxTx_t;
-    using typename Traits::CxLgrID_t;
-    using typename Traits::CxTxID_t;
-    using typename Traits::CxTxSetID_t;
-    using typename Traits::CxNodeID_t;
-    using CxDispute_t = DisputedTx <CxTx_t, CxTxID_t, CxNodeID_t>;
+    using typename Traits::Time_t;
+    using typename Traits::Pos_t;
+    using typename Traits::TxSet_t;
+    using typename Traits::Tx_t;
+    using typename Traits::LgrID_t;
+    using typename Traits::TxID_t;
+    using typename Traits::TxSetID_t;
+    using typename Traits::NodeID_t;
+    using Dispute_t = DisputedTx <Tx_t, TxID_t, NodeID_t>;
 
     /**
      * The result of applying a transaction to a ledger.
@@ -117,9 +113,9 @@ public:
         @param previousConvergeTime how long the last round took (ms)
     */
     void startRound (
-        CxLgrID_t const& prevLCLHash,
+        LgrID_t const& prevLCLHash,
         std::shared_ptr<Ledger const> const& prevLedger,
-        CxTime_t closeTime,
+        Time_t closeTime,
         int previousProposers,
         std::chrono::milliseconds previousConvergeTime) override;
 
@@ -133,14 +129,14 @@ public:
     Json::Value getJson (bool full) override;
 
     /* The hash of the last closed ledger */
-    CxLgrID_t getLCL () override;
+    LgrID_t getLCL () override;
 
     /**
       We have a complete transaction set, typically acquired from the network
 
       @param map      the transaction set.
     */
-    void gotMap (CxTxSet_t const& map) override;
+    void gotMap (TxSet_t const& map) override;
 
     /**
       On timer call the correct handler for each state.
@@ -154,7 +150,7 @@ public:
       @param newPosition the new position
       @return            true if we should do delayed relay of this position.
     */
-    bool peerPosition (CxPos_t const& newPosition) override;
+    bool peerPosition (Pos_t const& newPosition) override;
 
     void simulate(
         boost::optional<std::chrono::milliseconds> consensusDelay) override;
@@ -162,7 +158,7 @@ public:
     /**
       Put a transaction set where peers can find it
     */
-    void shareSet (CxTxSet_t const&);
+    void shareSet (TxSet_t const&);
 
 private:
     /**
@@ -193,7 +189,7 @@ private:
 
       @param lclHash Hash of the last closed ledger.
     */
-    void handleLCL (CxLgrID_t const& lclHash);
+    void handleLCL (LgrID_t const& lclHash);
 
     /**
       We have a complete transaction set, typically acquired from the network
@@ -202,14 +198,14 @@ private:
       @param acquired true if we have acquired the transaction set.
     */
     void mapCompleteInternal (
-        CxTxSet_t const& map,
+        TxSet_t const& map,
         bool acquired);
 
     /** We have a new last closed ledger, process it. Final accept logic
 
       @param set Our consensus set
     */
-    void accept (CxTxSet_t const& set);
+    void accept (TxSet_t const& set);
 
     /**
       Compare two proposed transaction sets and create disputed
@@ -218,8 +214,8 @@ private:
       @param m1 One transaction set
       @param m2 The other transaction set
     */
-    void createDisputes (CxTxSet_t const& m1,
-                         CxTxSet_t const& m2);
+    void createDisputes (TxSet_t const& m1,
+                         TxSet_t const& m2);
 
     /**
       Add a disputed transaction (one that at least one node wants
@@ -227,7 +223,7 @@ private:
 
       @param tx   The disputed transaction
     */
-    void addDisputedTransaction (CxTx_t const& tx);
+    void addDisputedTransaction (Tx_t const& tx);
 
     /**
       Adjust the votes on all disputed transactions based
@@ -236,8 +232,8 @@ private:
       @param map   A disputed position
       @param peers peers which are taking the position map
     */
-    void adjustCount (CxTxSet_t const& map,
-        std::vector<CxNodeID_t> const& peers);
+    void adjustCount (TxSet_t const& map,
+        std::vector<NodeID_t> const& peers);
 
     /**
       Revoke our outstanding proposal, if any, and
@@ -260,7 +256,7 @@ private:
     /** Determine our initial proposed transaction set based on
         our open ledger
     */
-    std::pair <CxTxSet_t, CxPos_t> makeInitialPosition();
+    std::pair <TxSet_t, Pos_t> makeInitialPosition();
 
     /** Take an initial position on what we think the consensus set should be
     */
@@ -309,18 +305,18 @@ private:
     FeeVote& feeVote_;
     std::recursive_mutex lock_;
 
-    CxNodeID_t ourID_;
+    NodeID_t ourID_;
     State state_;
 
     // The wall time this ledger closed
-    CxTime_t closeTime_;
+    Time_t closeTime_;
 
-    CxLgrID_t prevLedgerHash_;
-    CxLgrID_t acquiringLedger_;
+    LgrID_t prevLedgerHash_;
+    LgrID_t acquiringLedger_;
 
     std::shared_ptr<Ledger const> previousLedger_;
-    boost::optional<CxPos_t> ourPosition_;
-    boost::optional<CxTxSet_t> ourSet_;
+    boost::optional<Pos_t> ourPosition_;
+    boost::optional<TxSet_t> ourSet_;
     PublicKey valPublic_;
     SecretKey valSecret_;
     bool proposing_, validating_, haveCorrectLCL_, consensusFail_;
@@ -343,20 +339,20 @@ private:
     std::chrono::milliseconds previousRoundTime_;
 
     // Convergence tracking, trusted peers indexed by hash of public key
-    hash_map<CxNodeID_t, CxPos_t>  peerPositions_;
+    hash_map<NodeID_t, Pos_t>  peerPositions_;
 
     // Transaction Sets, indexed by hash of transaction tree
-    hash_map<CxTxSetID_t, const CxTxSet_t> acquired_;
+    hash_map<TxSetID_t, const TxSet_t> acquired_;
 
     // Disputed transactions
-    hash_map<CxTxID_t, CxDispute_t> disputes_;
-    hash_set<CxTxSetID_t> compares_;
+    hash_map<TxID_t, Dispute_t> disputes_;
+    hash_set<TxSetID_t> compares_;
 
     // Close time estimates, keep ordered for predictable traverse
-    std::map <CxTime_t, int> closeTimes_;
+    std::map <Time_t, int> closeTimes_;
 
     // nodes that have bowed out of this consensus process
-    hash_set<CxNodeID_t> deadNodes_;
+    hash_set<NodeID_t> deadNodes_;
     beast::Journal j_;
 };
 

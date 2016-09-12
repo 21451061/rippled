@@ -201,7 +201,7 @@ Json::Value LedgerConsensusImp<Traits>::getJson (bool full)
 
 template <class Traits>
 auto
-LedgerConsensusImp<Traits>::getLCL () -> CxLgrID_t
+LedgerConsensusImp<Traits>::getLCL () -> LgrID_t
 {
     std::lock_guard<std::recursive_mutex> _(lock_);
 
@@ -209,7 +209,7 @@ LedgerConsensusImp<Traits>::getLCL () -> CxLgrID_t
 }
 
 template <class Traits>
-void LedgerConsensusImp<Traits>::shareSet (CxTxSet_t const& set)
+void LedgerConsensusImp<Traits>::shareSet (TxSet_t const& set)
 {
     // Temporary until Consensus refactor is complete
     inboundTransactions_.giveSet (set.getID(),
@@ -227,7 +227,7 @@ void LedgerConsensusImp<Traits>::shareSet (CxTxSet_t const& set)
 template <class Traits>
 void
 LedgerConsensusImp<Traits>::mapCompleteInternal (
-    CxTxSet_t const& map,
+    TxSet_t const& map,
     bool acquired)
 {
     auto hash = map.getID ();
@@ -297,7 +297,7 @@ LedgerConsensusImp<Traits>::mapCompleteInternal (
 
 template <class Traits>
 void LedgerConsensusImp<Traits>::gotMap (
-    CxTxSet_t const& map)
+    TxSet_t const& map)
 {
     std::lock_guard<std::recursive_mutex> _(lock_);
 
@@ -400,7 +400,7 @@ void LedgerConsensusImp<Traits>::checkLCL ()
 
 // Handle a change in the LCL during a consensus round
 template <class Traits>
-void LedgerConsensusImp<Traits>::handleLCL (CxLgrID_t const& lclHash)
+void LedgerConsensusImp<Traits>::handleLCL (LgrID_t const& lclHash)
 {
     assert (lclHash != prevLedgerHash_ ||
             previousLedger_->info().hash != lclHash);
@@ -660,7 +660,7 @@ bool LedgerConsensusImp<Traits>::haveConsensus ()
 }
 
 template <class Traits>
-bool LedgerConsensusImp<Traits>::peerPosition (CxPos_t const& newPosition)
+bool LedgerConsensusImp<Traits>::peerPosition (Pos_t const& newPosition)
 {
     auto const peerID = newPosition.getNodeID ();
 
@@ -770,7 +770,7 @@ void LedgerConsensusImp<Traits>::simulate (
 }
 
 template <class Traits>
-void LedgerConsensusImp<Traits>::accept (CxTxSet_t const& set)
+void LedgerConsensusImp<Traits>::accept (TxSet_t const& set)
 {
     auto closeTime = ourPosition_->getCloseTime();
     bool closeTimeCorrect;
@@ -1066,8 +1066,8 @@ void LedgerConsensusImp<Traits>::accept (CxTxSet_t const& set)
 
 template <class Traits>
 void LedgerConsensusImp<Traits>::createDisputes (
-    CxTxSet_t const& m1,
-    CxTxSet_t const& m2)
+    TxSet_t const& m1,
+    TxSet_t const& m2)
 {
     if (m1.getID() == m2.getID())
         return;
@@ -1096,7 +1096,7 @@ void LedgerConsensusImp<Traits>::createDisputes (
 
 template <class Traits>
 void LedgerConsensusImp<Traits>::addDisputedTransaction (
-    CxTx_t const& tx)
+    Tx_t const& tx)
 {
     auto txID = tx.getID();
 
@@ -1112,7 +1112,7 @@ void LedgerConsensusImp<Traits>::addDisputedTransaction (
     if (ourSet_)
             ourVote = ourSet_->hasEntry (txID);
 
-    CxDispute_t txn {tx, ourVote, j_};
+    Dispute_t txn {tx, ourVote, j_};
 
     // Update all of the peer's votes on the disputed transaction
     for (auto& pit : peerPositions_)
@@ -1143,8 +1143,8 @@ void LedgerConsensusImp<Traits>::addDisputedTransaction (
 }
 
 template <class Traits>
-void LedgerConsensusImp<Traits>::adjustCount (CxTxSet_t const& map,
-    std::vector<CxNodeID_t> const& peers)
+void LedgerConsensusImp<Traits>::adjustCount (TxSet_t const& map,
+    std::vector<NodeID_t> const& peers)
 {
     for (auto& it : disputes_)
     {
@@ -1239,7 +1239,7 @@ void LedgerConsensusImp<Traits>::statusChange (
 template <class Traits>
 auto
 LedgerConsensusImp<Traits>::makeInitialPosition () ->
-    std::pair <CxTxSet_t, CxPos_t>
+    std::pair <TxSet_t, Pos_t>
 {
     // Tell the ledger master not to acquire the ledger we're probably building
     ledgerMaster_.setBuildingLedger (previousLedger_->info().seq + 1);
@@ -1405,11 +1405,11 @@ void LedgerConsensusImp<Traits>::updateOurPositions ()
     }
 
     // This will stay unseated unless there are any changes
-    boost::optional <CxTxSet_t> ourSet;
+    boost::optional <TxSet_t> ourSet;
 
     // Update votes on disputed transactions
     {
-        boost::optional <typename CxTxSet_t::mutable_t> changedSet;
+        boost::optional <typename TxSet_t::mutable_t> changedSet;
         for (auto& it : disputes_)
         {
             // Because the threshold for inclusion increases,
@@ -1673,9 +1673,9 @@ void LedgerConsensusImp<Traits>::endConsensus (bool correctLCL)
 
 template <class Traits>
 void LedgerConsensusImp<Traits>::startRound (
-    CxLgrID_t const& prevLCLHash,
+    LgrID_t const& prevLCLHash,
     std::shared_ptr<Ledger const> const& prevLedger,
-    CxTime_t closeTime,
+    Time_t closeTime,
     int previousProposers,
     std::chrono::milliseconds previousConvergeTime)
 {

@@ -44,31 +44,31 @@ class LedgerConsensus : public Traits
 {
 public:
 
-    using typename Traits::CxTime_t;
-    using typename Traits::CxPos_t;
-    using typename Traits::CxTxSet_t;
-    using typename Traits::CxTx_t;
-    using typename Traits::CxLgrID_t;
-    using typename Traits::CxTxID_t;
-    using typename Traits::CxTxSetID_t;
-    using typename Traits::CxNodeID_t;
+    using typename Traits::Time_t;
+    using typename Traits::Pos_t;
+    using typename Traits::TxSet_t;
+    using typename Traits::Tx_t;
+    using typename Traits::LgrID_t;
+    using typename Traits::TxID_t;
+    using typename Traits::TxSetID_t;
+    using typename Traits::NodeID_t;
 
     virtual ~LedgerConsensus() = default;
 
     virtual Json::Value getJson (bool full) = 0;
 
-    virtual CxLgrID_t getLCL () = 0;
+    virtual LgrID_t getLCL () = 0;
 
-    virtual void gotMap (CxTxSet_t const& map) = 0;
+    virtual void gotMap (TxSet_t const& map) = 0;
 
     virtual void timerEntry () = 0;
 
-    virtual bool peerPosition (CxPos_t const& position) = 0;
+    virtual bool peerPosition (Pos_t const& position) = 0;
 
     virtual void startRound (
-        CxLgrID_t const& prevLCLHash,
+        LgrID_t const& prevLCLHash,
         std::shared_ptr<Ledger const> const& prevLedger,
-        CxTime_t closeTime,
+        Time_t closeTime,
         int previousProposers,
         std::chrono::milliseconds previousConvergeTime) = 0;
 

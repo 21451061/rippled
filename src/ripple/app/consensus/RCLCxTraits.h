@@ -38,16 +38,16 @@ class RCLCxTraits
 {
 public:
 
-    using CxTime_t    = NetClock::time_point;
+    using Time_t    = NetClock::time_point;
 
-    using CxPos_t     = RCLCxPos;
-    using CxTxSet_t   = RCLTxSet;
-    using CxTx_t      = RCLCxTx;
+    using Pos_t     = RCLCxPos;
+    using TxSet_t   = RCLTxSet;
+    using Tx_t      = RCLCxTx;
 
-    using CxLgrID_t   = LedgerHash;
-    using CxTxID_t    = uint256;
-    using CxTxSetID_t = uint256;
-    using CxNodeID_t  = NodeID;
+    using LgrID_t   = LedgerHash;
+    using TxID_t    = uint256;
+    using TxSetID_t = uint256;
+    using NodeID_t  = NodeID;
 };
 
 }
