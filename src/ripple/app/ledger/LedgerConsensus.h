@@ -35,9 +35,6 @@
 namespace ripple {
 
 /** Manager for achieving consensus on the next ledger.
-
-    This object is created when the consensus process starts, and
-    is destroyed when the process is complete.
 */
 template <class Traits>
 class LedgerConsensus : public Traits
