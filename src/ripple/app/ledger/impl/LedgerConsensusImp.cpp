@@ -970,7 +970,7 @@ void LedgerConsensusImp<Traits>::accept (TxSet_t const& set)
                         << "Test applying disputed transaction that did"
                         << " not get in";
 
-                    RCLCxTx cTxn {it.second.peekTransaction()};
+                    RCLCxTx cTxn {it.second.tx()};
                     SerialIter sit (cTxn.txn().slice());
 
                     auto txn = std::make_shared<STTx const>(sit);
@@ -1422,7 +1422,7 @@ void LedgerConsensusImp<Traits>::updateOurPositions ()
                 if (it.second.getOurVote ())
                 {
                     // now a yes
-                    changedSet->addEntry (it.second.peekTransaction());
+                    changedSet->addEntry (it.second.tx());
                 }
                 else
                 {

@@ -37,10 +37,15 @@ namespace ripple {
     Undisputed transactions have no corresponding @ref DisputedTx object.
 */
 
-template <class Tx_t, class TxID_t, class NodeID_t>
+template <class Traits>
 class DisputedTx
 {
 public:
+
+    using Tx_t     = typename Traits::Tx_t;
+    using TxID_t   = typename Traits::TxID_t;
+    using NodeID_t = typename Traits::NodeID_t;
+
     DisputedTx (Tx_t const& tx,
             bool ourVote, beast::Journal j)
         : mTransactionID (tx.getID())
@@ -52,7 +57,7 @@ public:
     {
     }
 
-    TxID_t const& getTransactionID () const
+    TxID_t const& getID () const
     {
         return mTransactionID;
     }
@@ -62,7 +67,7 @@ public:
         return mOurVote;
     }
 
-    Tx_t const& peekTransaction () const
+    Tx_t const& tx () const
     {
         return transaction;
     }
@@ -90,8 +95,8 @@ private:
 };
 
 // Track a peer's yes/no vote on a particular disputed transaction
-template <class Tx_t, class TxID_t, class NodeID_t>
-void DisputedTx<Tx_t,TxID_t,NodeID_t>::setVote (NodeID_t const& peer, bool votesYes)
+template <class Traits>
+void DisputedTx<Traits>::setVote (NodeID_t const& peer, bool votesYes)
 {
     auto res = mVotes.insert (std::make_pair (peer, votesYes));
 
@@ -132,8 +137,8 @@ void DisputedTx<Tx_t,TxID_t,NodeID_t>::setVote (NodeID_t const& peer, bool votes
 }
 
 // Remove a peer's vote on this disputed transasction
-template <class Tx_t, class TxID_t, class NodeID_t>
-void DisputedTx<Tx_t,TxID_t,NodeID_t>::unVote (NodeID_t const& peer)
+template <class Traits>
+void DisputedTx<Traits>::unVote (NodeID_t const& peer)
 {
     auto it = mVotes.find (peer);
 
@@ -148,12 +153,9 @@ void DisputedTx<Tx_t,TxID_t,NodeID_t>::unVote (NodeID_t const& peer)
     }
 }
 
-template <class Tx_t, class TxID_t, class NodeID_t>
-bool DisputedTx<Tx_t,TxID_t,NodeID_t>::updateVote (int percentTime, bool proposing)
+template <class Traits>
+bool DisputedTx<Traits>::updateVote (int percentTime, bool proposing)
 {
-    // VFALCO TODO Give the return value a descriptive local variable name
-    //             and don't return from the middle.
-
     if (mOurVote && (mNays == 0))
         return false;
 
@@ -207,8 +209,8 @@ bool DisputedTx<Tx_t,TxID_t,NodeID_t>::updateVote (int percentTime, bool proposi
     return true;
 }
 
-template <class Tx_t, class TxID_t, class NodeID_t>
-Json::Value DisputedTx<Tx_t,TxID_t,NodeID_t>::getJson ()
+template <class Traits>
+Json::Value DisputedTx<Traits>::getJson ()
 {
     Json::Value ret (Json::objectValue);
 

@@ -34,8 +34,8 @@ class RCLCxPos
 
 public:
 
-    static std::uint32_t const seqInitial = 0;
-    static std::uint32_t const seqLeave = 0xffffffff;
+    static std::uint32_t constexpr seqInitial = 0;
+    static std::uint32_t constexpr seqLeave = 0xffffffff;
 
     RCLCxPos (LedgerProposal const& prop) :
         proposal_ (prop)
