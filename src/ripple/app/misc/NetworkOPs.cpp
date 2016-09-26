@@ -1507,9 +1507,7 @@ void NetworkOPsImp::processTrustedProposal (
     mConsensus->storeProposal (proposal, node);
 
     if (mLedgerConsensus->peerPosition (*proposal))
-    {
         app_.overlay().relay(*set, proposal->getSuppressionID());
-    }
     else
         JLOG(m_journal.info()) << "Not relaying trusted proposal";
 }

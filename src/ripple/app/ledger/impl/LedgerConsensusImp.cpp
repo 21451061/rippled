@@ -213,7 +213,7 @@ void LedgerConsensusImp<Traits>::shareSet (TxSet_t const& set)
 {
     // Temporary until Consensus refactor is complete
     inboundTransactions_.giveSet (set.getID(),
-        set.getMap(), false);
+        set.map(), false);
 }
 
 // Called when:
@@ -1110,7 +1110,7 @@ void LedgerConsensusImp<Traits>::addDisputedTransaction (
 
     // Update our vote on the disputed transaction
     if (ourSet_)
-            ourVote = ourSet_->hasEntry (txID);
+        ourVote = ourSet_->hasEntry (txID);
 
     Dispute_t txn {tx, ourVote, j_};
 
@@ -1127,7 +1127,7 @@ void LedgerConsensusImp<Traits>::addDisputedTransaction (
     // If we didn't relay this transaction recently, relay it to all peers
     if (app_.getHashRouter ().shouldRelay (txID))
     {
-        auto const& slice = tx.txn().slice();
+        auto const slice = tx.txn().slice();
 
         protocol::TMTransaction msg;
         msg.set_rawtransaction (slice.data(), slice.size());
@@ -1805,7 +1805,7 @@ applyTransactions (
 {
     auto j = app.journal ("LedgerConsensus");
 
-    auto& set = *(cSet.getMap());
+    auto& set = *(cSet.map());
     CanonicalTXSet retriableTxs (set.getHash().as_uint256());
 
     for (auto const& item : set)
